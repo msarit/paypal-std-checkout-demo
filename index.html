@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PayPal Standard Checkout Demo</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+  </head>
+
+  <body class="p-6">
+    <h1 class="text-center text-4xl font-medium">LiftOff Shop</h1>
+    <main class="products flex flex-wrap justify-center">
+      <div
+        class="product text-center m-3 p-3 border border-slate-400 rounded-md"
+      >
+        <img src="https://picsum.photos/id/21/200" class="rounded-md" />
+        <h2 class="text-xl my-2">Galaxy Shoes</h2>
+        <p class="text-green-600 font-medium text-lg mb-2">$100</p>
+        <div class="mb-3">
+          <label class="text-lg" for="quantity1">Quantity:</label>
+          <select class="text-lg" id="quantity1">
+            <option value="0">0</option>
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+          </select>
+        </div>
+        <button
+          class="py-1 px-3 rounded-md bg-indigo-200 hover:bg-indigo-300"
+          onclick="addToCart('galaxyShoes','quantity1')"
+        >
+          Add to Cart
+        </button>
+      </div>
+
+      <div
+        class="product text-center m-3 p-3 border border-slate-400 rounded-md"
+      >
+        <img src="https://picsum.photos/id/104/200" class="rounded-md" />
+        <h2 class="text-xl my-2">Spaceship Earrings</h2>
+        <p class="text-green-600 font-medium text-lg mb-2">$40</p>
+        <div class="mb-3">
+          <label class="text-lg" for="quantity2">Quantity:</label>
+          <select class="text-lg" id="quantity2">
+            <option value="0">0</option>
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+          </select>
+        </div>
+        <button
+          class="py-1 px-3 rounded-md bg-indigo-200 hover:bg-indigo-300"
+          onclick="addToCart('spaceshipEarrings', 'quantity2')"
+        >
+          Add to Cart
+        </button>
+      </div>
+
+      <div
+        class="product text-center m-3 p-3 border border-slate-400 rounded-md"
+      >
+        <img src="https://picsum.photos/id/342/200" class="rounded-md" />
+        <h2 class="text-xl my-2">Martian Tote</h2>
+        <p class="text-green-600 font-medium text-lg mb-2">$75</p>
+        <div class="mb-3">
+          <label class="text-lg" for="quantity3">Quantity:</label>
+          <select class="text-lg" id="quantity3">
+            <option value="0">0</option>
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+          </select>
+        </div>
+        <button
+          class="py-1 px-3 rounded-md bg-indigo-200 hover:bg-indigo-300"
+          onclick="addToCart('martianTote', 'quantity3')"
+        >
+          Add to Cart
+        </button>
+      </div>
+    </main>
+
+    <section class="mt-8 flex">
+      <div class="w-1/2" id="cart">
+        <h2>Cart</h2>
+        <ul id="cart-items"></ul>
+        <p>TOTAL $<span id="cart-total">0</span></p>
+      </div>
+      <div id="paypal-button-container"></div>
+    </section>
+
+    <script>
+      const itemPrices = {
+        galaxyShoes: 100,
+        spaceshipEarrings: 40,
+        martianTote: 75,
+      };
+      let cartItems = {};
+      let cartTotal = 0;
+
+      function addToCart(productName, quantityId) {
+        const quantitySelect = document.getElementById(quantityId);
+        const selectedQuantity = parseInt(quantitySelect.value, 10);
+
+        if (selectedQuantity > 0) {
+          const totalForProduct = itemPrices[productName] * selectedQuantity;
+          cartItems[productName] = {
+            quantity: selectedQuantity,
+            total: totalForProduct,
+          };
+          cartTotal = calculateCartTotal();
+          updateCart();
+        }
+      }
+
+      function calculateCartTotal() {
+        let total = 0;
+        for (const key in cartItems) {
+          if (cartItems.hasOwnProperty(key)) {
+            total += cartItems[key].total;
+          }
+        }
+        return total;
+      }
+
+      function updateCart() {
+        const cartItemsList = document.getElementById("cart-items");
+        const cartTotalElement = document.getElementById("cart-total");
+
+        cartItemsList.innerHTML = "";
+        cartTotalElement.textContent = cartTotal;
+
+        for (const key in cartItems) {
+          const li = document.createElement("li");
+          li.textContent = `${key}: ${cartItems[key].quantity}`;
+          cartItemsList.appendChild(li);
+        }
+      }
+    </script>
+    <script src="https://www.paypal.com/sdk/js?client-id=AYCd0wKOWs9itZ23_2XEZUhZpbZdHT_c1qcMCjqTnb6fxFE7tQBnUQGSPh3_PVQkgoBamFV1KgPUI9B4&components=buttons&enable-funding=venmo,paylater"></script>
+    <script>
+      paypal
+        .Buttons({
+          // Order is created on the server and the order id is returned
+          createOrder() {
+            return fetch("/my-server/create-paypal-order", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              // use the "body" param to optionally pass additional order information
+              // like product skus and quantities
+              body: JSON.stringify({
+                cart: [
+                  {
+                    sku: "YOUR_PRODUCT_STOCK_KEEPING_UNIT",
+                    quantity: "YOUR_PRODUCT_QUANTITY",
+                  },
+                ],
+              }),
+            })
+              .then((response) => response.json())
+              .then((order) => order.id);
+          },
+          // Finalize the transaction on the server after payer approval
+          onApprove(data) {
+            return fetch("/my-server/capture-paypal-order", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                orderID: data.orderID,
+              }),
+            })
+              .then((response) => response.json())
+              .then((orderData) => {
+                // Successful capture! For dev/demo purposes:
+                console.log(
+                  "Capture result",
+                  orderData,
+                  JSON.stringify(orderData, null, 2)
+                );
+                const transaction =
+                  orderData.purchase_units[0].payments.captures[0];
+                alert(
+                  `Transaction ${transaction.status}: ${transaction.id}\n\nSee console for all available details`
+                );
+                // When ready to go live, remove the alert and show a success message within this page. For example:
+                // const element = document.getElementById('paypal-button-container');
+                // element.innerHTML = '<h3>Thank you for your payment!</h3>';
+                // Or go to another URL:  window.location.href = 'thank_you.html';
+              });
+          },
+        })
+        .render("#paypal-button-container");
+    </script>
+  </body>
+
+  <body>
+    <script data-sdk-integration-source="integrationbuilder_sc"></script>
+    <div id="paypal-button-container"></div>
+    <script src="https://www.paypal.com/sdk/js?client-id=AYCd0wKOWs9itZ23_2XEZUhZpbZdHT_c1qcMCjqTnb6fxFE7tQBnUQGSPh3_PVQkgoBamFV1KgPUI9B4&components=buttons&enable-funding=venmo,paylater"></script>
+    <script>
+      const FUNDING_SOURCES = [
+        // EDIT FUNDING SOURCES
+        paypal.FUNDING.PAYPAL,
+        paypal.FUNDING.PAYLATER,
+        paypal.FUNDING.VENMO,
+        paypal.FUNDING.CARD,
+      ];
+      FUNDING_SOURCES.forEach((fundingSource) => {
+        paypal
+          .Buttons({
+            fundingSource,
+
+            style: {
+              layout: "vertical",
+              shape: "rect",
+              color: fundingSource == paypal.FUNDING.PAYLATER ? "gold" : "",
+            },
+
+            createOrder: async (data, actions) => {
+              try {
+                const response = await fetch("http://localhost:9597/orders", {
+                  method: "POST",
+                });
+
+                const details = await response.json();
+                return details.id;
+              } catch (error) {
+                console.error(error);
+                // Handle the error or display an appropriate error message to the user
+              }
+            },
+
+            onApprove: async (data, actions) => {
+              try {
+                const response = await fetch(
+                  `http://localhost:9597/orders/${data.orderID}/capture`,
+                  {
+                    method: "POST",
+                  }
+                );
+
+                const details = await response.json();
+                // Three cases to handle:
+                //   (1) Recoverable INSTRUMENT_DECLINED -> call actions.restart()
+                //   (2) Other non-recoverable errors -> Show a failure message
+                //   (3) Successful transaction -> Show confirmation or thank you message
+
+                // This example reads a v2/checkout/orders capture response, propagated from the server
+                // You could use a different API or structure for your 'orderData'
+                const errorDetail =
+                  Array.isArray(details.details) && details.details[0];
+
+                if (
+                  errorDetail &&
+                  errorDetail.issue === "INSTRUMENT_DECLINED"
+                ) {
+                  return actions.restart();
+                  // https://developer.paypal.com/docs/checkout/integration-features/funding-failure/
+                }
+
+                if (errorDetail) {
+                  let msg = "Sorry, your transaction could not be processed.";
+                  msg += errorDetail.description
+                    ? " " + errorDetail.description
+                    : "";
+                  msg += details.debug_id ? " (" + details.debug_id + ")" : "";
+                  alert(msg);
+                }
+
+                // Successful capture! For demo purposes:
+                console.log(
+                  "Capture result",
+                  details,
+                  JSON.stringify(details, null, 2)
+                );
+                const transaction =
+                  details.purchase_units[0].payments.captures[0];
+                alert(
+                  "Transaction " +
+                    transaction.status +
+                    ": " +
+                    transaction.id +
+                    "See console for all available details"
+                );
+              } catch (error) {
+                console.error(error);
+                // Handle the error or display an appropriate error message to the user
+              }
+            },
+          })
+          .render("#paypal-button-container");
+      });
+    </script>
+  </body>
+</html>
