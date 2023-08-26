@@ -51,6 +51,20 @@ const createOrder = async (cart) => {
     cart
   );
 
+  const itemPrices = {
+    galaxyShoes: 100,
+    spaceshipEarrings: 40,
+    martianTote: 75,
+  };
+
+  function calculateTotalPrice(cart) {
+    let totalPrice = 0;
+    for (let i = 0; i < cart.length; i++) {
+      totalPrice += itemPrices[cart[i].id] * cart[i].quantity;
+    }
+    return totalPrice.toString();
+  }
+
   const accessToken = await generateAccessToken();
   const url = `${base}/v2/checkout/orders`;
   const payload = {
@@ -59,7 +73,7 @@ const createOrder = async (cart) => {
       {
         amount: {
           currency_code: "USD",
-          value: "100.00",
+          value: calculateTotalPrice(cart),
         },
       },
     ],

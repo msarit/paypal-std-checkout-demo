@@ -1,3 +1,69 @@
+// THIS IS THE CODE THAT I WILL USE TO KEEP A HASH FOR THE CART
+// BUT USE AN ARRAY FOR THE ORDERS API
+
+// const hashTable = {
+//   key1: {
+//     name: "John Doe",
+//     age: 30,
+//   },
+//   key2: {
+//     name: "Jane Doe",
+//     age: 25,
+//   },
+// };
+
+// const objectsArray = [];
+
+// for (const key in hashTable) {
+//   objectsArray.push(hashTable[key]);
+// }
+
+const itemPrices = {
+  galaxyShoes: 100,
+  spaceshipEarrings: 40,
+  martianTote: 75,
+};
+let cartItems = [];
+let cartTotal = 0;
+
+function addToCart(productName, quantityId) {
+  const quantitySelect = document.getElementById(quantityId);
+  const selectedQuantity = parseInt(quantitySelect.value, 10);
+
+  if (selectedQuantity > 0) {
+    const totalForProduct = itemPrices[productName] * selectedQuantity;
+    cartItems.push({
+      id: productName,
+      quantity: selectedQuantity,
+    });
+    cartTotal = calculateCartTotal();
+    updateCart();
+  }
+}
+
+function calculateCartTotal() {
+  let total = 0;
+  cartItems.forEach((item) => {
+    total += item.quantity * itemPrices[item.id];
+  });
+
+  return total;
+}
+
+function updateCart() {
+  const cartItemsList = document.getElementById("cart-items");
+  const cartTotalElement = document.getElementById("cart-total");
+
+  cartItemsList.innerHTML = "";
+  cartTotalElement.textContent = cartTotal;
+
+  cartItems.forEach((item) => {
+    const li = document.createElement("li");
+    li.textContent = `${item.id}: ${item.quantity}`;
+    cartItemsList.appendChild(li);
+  });
+}
+
 window.paypal
   .Buttons({
     async createOrder() {
@@ -10,12 +76,7 @@ window.paypal
           // use the "body" param to optionally pass additional order information
           // like product ids and quantities
           body: JSON.stringify({
-            cart: [
-              {
-                id: "YOUR_PRODUCT_ID",
-                quantity: "YOUR_PRODUCT_QUANTITY",
-              },
-            ],
+            cart: cartItems,
           }),
         });
 
@@ -93,3 +154,13 @@ function resultMessage(message) {
   const container = document.querySelector("#result-message");
   container.innerHTML = message;
 }
+
+// Event Listeners
+const productBtns = document.querySelectorAll(".product-btn");
+productBtns.forEach((btn) => {
+  btn.addEventListener("click", (e) => {
+    const productName = e.target.dataset.productName;
+    const quantityId = e.target.dataset.quantityId;
+    addToCart(productName, quantityId);
+  });
+});
