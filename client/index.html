@@ -26,7 +26,7 @@
         </div>
         <button
           class="product-btn py-1 px-3 rounded-md bg-indigo-200 hover:bg-indigo-300"
-          data-product-name="galaxyShoes"
+          data-product-id="hdqgapq9"
           data-quantity-id="quantity1"
         >
           Add to Cart
@@ -50,7 +50,7 @@
         </div>
         <button
           class="product-btn py-1 px-3 rounded-md bg-indigo-200 hover:bg-indigo-300"
-          data-product-name="spaceshipEarrings"
+          data-product-id="rnfjwsy0"
           data-quantity-id="quantity2"
         >
           Add to Cart
@@ -74,7 +74,7 @@
         </div>
         <button
           class="product-btn py-1 px-3 rounded-md bg-indigo-200 hover:bg-indigo-300"
-          data-product-name="martianTote"
+          data-product-id="zytkddw5"
           data-quantity-id="quantity3"
         >
           Add to Cart
@@ -82,17 +82,24 @@
       </div>
     </main>
 
-    <section class="mt-8 flex">
-      <div class="w-1/2" id="cart">
-        <h2>Cart</h2>
+    <p id="result-message" class="text-center text-red-600"></p>
+
+    <section class="mt-8 mx-auto flex flex-wrap w-1/2">
+      <div class="mb-3 w-1/2 text-center" id="cart">
+        <h2 class="text-xl font-medium">Cart</h2>
         <ul id="cart-items"></ul>
         <p>TOTAL $<span id="cart-total">0</span></p>
-        <p id="result-message"></p>
+        <button
+          id="clear-cart"
+          class="py-1 px-3 mt-3 rounded-md bg-gray-200 hover:bg-gray-300"
+        >
+          Clear Cart
+        </button>
       </div>
-      <div id="paypal-button-container"></div>
+      <div class="text-center" id="paypal-button-container"></div>
     </section>
 
-    <script src="https://www.paypal.com/sdk/js?client-id=AYCd0wKOWs9itZ23_2XEZUhZpbZdHT_c1qcMCjqTnb6fxFE7tQBnUQGSPh3_PVQkgoBamFV1KgPUI9B4&currency=USD"></script>
-    <script src="app.js"></script>
+    <script src="https://www.paypal.com/sdk/js?client-id=AYCd0wKOWs9itZ23_2XEZUhZpbZdHT_c1qcMCjqTnb6fxFE7tQBnUQGSPh3_PVQkgoBamFV1KgPUI9B4&currency=USD&enable-funding=venmo,paylater"></script>
+    <script type="module" src="app.js"></script>
   </body>
 </html>

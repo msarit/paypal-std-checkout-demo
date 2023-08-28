@@ -2,6 +2,7 @@ import express from "express";
 import fetch from "node-fetch";
 import "dotenv/config";
 import path from "path";
+import { ITEMS } from "../client/constants.js";
 
 const { PAYPAL_CLIENT_ID, PAYPAL_CLIENT_SECRET, PORT = 8888 } = process.env;
 const base = "https://api-m.sandbox.paypal.com";
@@ -51,16 +52,10 @@ const createOrder = async (cart) => {
     cart
   );
 
-  const itemPrices = {
-    galaxyShoes: 100,
-    spaceshipEarrings: 40,
-    martianTote: 75,
-  };
-
   function calculateTotalPrice(cart) {
     let totalPrice = 0;
     for (let i = 0; i < cart.length; i++) {
-      totalPrice += itemPrices[cart[i].id] * cart[i].quantity;
+      totalPrice += ITEMS[cart[i].id].price * cart[i].quantity;
     }
     return totalPrice.toString();
   }
@@ -74,6 +69,30 @@ const createOrder = async (cart) => {
         amount: {
           currency_code: "USD",
           value: calculateTotalPrice(cart),
+        },
+        shipping: {
+          options: [
+            {
+              id: "SHIP_123",
+              label: "Flat-Rate Shipping",
+              type: "SHIPPING",
+              selected: true,
+              amount: {
+                value: "3.00",
+                currency_code: "USD",
+              },
+            },
+            {
+              id: "SHIP_456",
+              label: "Pick up in Store",
+              type: "PICKUP",
+              selected: false,
+              amount: {
+                value: "0.00",
+                currency_code: "USD",
+              },
+            },
+          ],
         },
       },
     ],

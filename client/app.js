@@ -1,39 +1,15 @@
-// THIS IS THE CODE THAT I WILL USE TO KEEP A HASH FOR THE CART
-// BUT USE AN ARRAY FOR THE ORDERS API
+import { ITEMS } from "./constants.js";
 
-// const hashTable = {
-//   key1: {
-//     name: "John Doe",
-//     age: 30,
-//   },
-//   key2: {
-//     name: "Jane Doe",
-//     age: 25,
-//   },
-// };
-
-// const objectsArray = [];
-
-// for (const key in hashTable) {
-//   objectsArray.push(hashTable[key]);
-// }
-
-const itemPrices = {
-  galaxyShoes: 100,
-  spaceshipEarrings: 40,
-  martianTote: 75,
-};
 let cartItems = [];
 let cartTotal = 0;
 
-function addToCart(productName, quantityId) {
+function addToCart(productId, quantityId) {
   const quantitySelect = document.getElementById(quantityId);
   const selectedQuantity = parseInt(quantitySelect.value, 10);
 
   if (selectedQuantity > 0) {
-    const totalForProduct = itemPrices[productName] * selectedQuantity;
     cartItems.push({
-      id: productName,
+      id: productId,
       quantity: selectedQuantity,
     });
     cartTotal = calculateCartTotal();
@@ -44,7 +20,7 @@ function addToCart(productName, quantityId) {
 function calculateCartTotal() {
   let total = 0;
   cartItems.forEach((item) => {
-    total += item.quantity * itemPrices[item.id];
+    total += item.quantity * ITEMS[item.id].price;
   });
 
   return total;
@@ -59,7 +35,7 @@ function updateCart() {
 
   cartItems.forEach((item) => {
     const li = document.createElement("li");
-    li.textContent = `${item.id}: ${item.quantity}`;
+    li.textContent = `${ITEMS[item.id].name}: ${item.quantity}`;
     cartItemsList.appendChild(li);
   });
 }
@@ -159,8 +135,14 @@ function resultMessage(message) {
 const productBtns = document.querySelectorAll(".product-btn");
 productBtns.forEach((btn) => {
   btn.addEventListener("click", (e) => {
-    const productName = e.target.dataset.productName;
+    const productId = e.target.dataset.productId;
     const quantityId = e.target.dataset.quantityId;
-    addToCart(productName, quantityId);
+    addToCart(productId, quantityId);
   });
+});
+
+document.getElementById("clear-cart").addEventListener("click", () => {
+  cartItems = [];
+  cartTotal = 0;
+  updateCart();
 });
