@@ -1,9 +1,3 @@
-const ITEM_PRICES = {
-  galaxyShoes: 100,
-  spaceshipEarrings: 40,
-  martianTote: 75,
-};
-
 const ITEMS = {
   hdqgapq9: {
     sku: "hdqgapq9",

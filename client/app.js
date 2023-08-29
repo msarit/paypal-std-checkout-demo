@@ -1,6 +1,6 @@
 import { ITEMS } from "./constants.js";
 
-let cartItems = [];
+const cartItems = [];
 let cartTotal = 0;
 
 function addToCart(productId, quantityId) {
@@ -17,7 +17,7 @@ function addToCart(productId, quantityId) {
   }
 }
 
-function calculateCartTotal() {
+function calculateCartTotal(cartItems) {
   let total = 0;
   cartItems.forEach((item) => {
     total += item.quantity * ITEMS[item.id].price;

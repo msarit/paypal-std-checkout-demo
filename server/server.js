@@ -41,6 +41,14 @@ const generateAccessToken = async () => {
   }
 };
 
+function calculateTotalPrice(cart) {
+  let totalPrice = 0;
+  for (let i = 0; i < cart.length; i++) {
+    totalPrice += ITEMS[cart[i].id].price * cart[i].quantity;
+  }
+  return totalPrice.toString();
+}
+
 /**
  * Create an order to start the transaction.
  * @see https://developer.paypal.com/docs/api/orders/v2/#orders_create
@@ -51,14 +59,6 @@ const createOrder = async (cart) => {
     "shopping cart information passed from the frontend createOrder() callback:",
     cart
   );
-
-  function calculateTotalPrice(cart) {
-    let totalPrice = 0;
-    for (let i = 0; i < cart.length; i++) {
-      totalPrice += ITEMS[cart[i].id].price * cart[i].quantity;
-    }
-    return totalPrice.toString();
-  }
 
   const accessToken = await generateAccessToken();
   const url = `${base}/v2/checkout/orders`;
